@@ -1,0 +1,15 @@
+/* Arithmetic scroll — demonstrates operator precedence */
+summon a;
+summon b;
+cast result;
+
+a = 10;
+b = 3;
+
+/* result = 10 + (3 * 2) = 16  — multiplication before addition */
+result = a + b * 2;
+cast result;
+
+/* Parentheses override precedence: (10 + 3) * 2 = 26 */
+result = (a + b) * 2;
+cast result;

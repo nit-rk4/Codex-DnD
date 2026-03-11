@@ -1,0 +1,2 @@
+# Codex-DnD requires Python 3.8+ and no external packages.
+# The compiler uses only the Python standard library.

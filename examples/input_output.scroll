@@ -1,0 +1,7 @@
+/* Input / Output scroll — reads a value and doubles it */
+summon name_value;
+divine name_value;
+
+summon doubled;
+doubled = name_value * 2;
+cast doubled;

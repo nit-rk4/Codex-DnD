@@ -1,0 +1,4 @@
+/* The simplest scroll — hello world for the Codex */
+summon x;
+x = 42;
+cast x;

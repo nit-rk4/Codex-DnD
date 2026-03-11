@@ -1,0 +1,12 @@
+/* Comments scroll
+   Demonstrates multi-line and inline comment support.
+
+   This entire block is a comment.
+   It spans several lines.
+*/
+
+summon x; /* declare x right here */
+x = 7; /* lucky number */
+
+/* x now holds 7 */
+cast x; /* print the result of our incantation */
