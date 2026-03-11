@@ -251,7 +251,7 @@ class Parser:
         """Parse a primary / atomic expression."""
         tok = self._current()
 
-        if tok.type == TokenType.RuneStone:
+        if tok.type == TokenType.RUNE_STONE:
             self._advance()
             return RuneStone(tok.value, tok.line)
 

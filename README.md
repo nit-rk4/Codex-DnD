@@ -108,7 +108,7 @@ python -m src.main examples/hello.scroll --tokens
 python -m src.main examples/hello.scroll --ast
 
 # Read from stdin
-echo "var x; x = 7; output x;" | python -m src.main
+echo "summon x; x = 7; cast x;" | python -m src.main
 ```
 
 ---

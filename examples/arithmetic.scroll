@@ -1,7 +1,7 @@
 /* Arithmetic scroll — demonstrates operator precedence */
 summon a;
 summon b;
-cast result;
+summon result;
 
 a = 10;
 b = 3;
