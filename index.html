@@ -44,8 +44,7 @@
             align-items: center;
             min-height: 100vh;
             
-            /* YOUR NEW ANIMATED BACKGROUND FOR THE MAIN APP */
-            background: url('assets/animated_background_inside.gif') center/cover fixed no-repeat var(--bg-color);
+            background: url('assets/ani_bg_inside_by_brullov.gif') center/cover fixed no-repeat var(--bg-color);
         }
 
         h1, h2, button, .press-start {
@@ -61,9 +60,7 @@
         #intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            
-            /* Replace 'my_animated_background.gif' with your EXACT file name */
-            background: url('assets/my_animated_background.gif') center/cover no-repeat #222; 
+            background: url('assets/anmtd_bg_by_brullov.gif') center/cover no-repeat #222; 
             
             z-index: 9999;
             display: flex;
@@ -246,7 +243,6 @@
     </style>
 </head>
 <body>
-
     <div id="intro-screen" onclick="startGame()">
         <div class="intro-content">
             <h1>[🐉 CODEX-DnD 🐉]</h1>
@@ -254,7 +250,9 @@
             <div class="blink press-start">> PRESS START &lt;</div>
         </div>
     </div>
-
+<audio id="bg-music" loop>
+        <source src="assets/mysticgrove_by_alkakrab.mp3" type="audio/mpeg">
+    </audio>
     <div id="main-app">
         <header>
             <h1>[ THE CODEX- DnD COMPILER ]<br></h1>
