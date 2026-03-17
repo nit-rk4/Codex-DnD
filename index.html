@@ -302,6 +302,11 @@ cast result;
             const introScreen = document.getElementById('intro-screen');
             const mainApp = document.getElementById('main-app');
             
+            
+            const music = document.getElementById('bg-music');
+            music.volume = 0.3; // Sets volume to 30% so it's not too loud
+            music.play(); 
+
             introScreen.style.opacity = '0';
             
             setTimeout(() => {
@@ -309,7 +314,6 @@ cast result;
                 mainApp.style.display = 'flex'; 
             }, 1000); 
         }
-
         async function typeText(elementId, htmlContent) {
             const consoleEl = document.getElementById(elementId);
             const newDiv = document.createElement('div');
