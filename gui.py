@@ -10,7 +10,7 @@ PORT = 8000
 
 class CodexHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
-        # We only care about the /cast endpoint
+        
         if self.path == '/cast':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -28,7 +28,7 @@ class CodexHandler(http.server.SimpleHTTPRequestHandler):
                 f.write(code)
 
             try:
-                # Call your actual compiler engine!
+                #call the actual compiler engine
                 result = subprocess.run(
                     ['python', '-m', 'src.main', temp_file],
                     input=user_inputs,
@@ -62,12 +62,11 @@ def open_browser():
     webbrowser.open_new(f"http://127.0.0.1:{PORT}/index.html")
 
 if __name__ == "__main__":
-    # Ensure index.html exists in the same folder
     if not os.path.exists('index.html'):
         print("💀 Curse: Cannot find index.html in the current directory.")
         exit(1)
 
-    # Delay the browser opening for 1 second so the server can start
+    #delay the browser opening for 1 second so the server can start
     Timer(1.25, open_browser).start()
 
     with socketserver.TCPServer(("", PORT), CodexHandler) as httpd:

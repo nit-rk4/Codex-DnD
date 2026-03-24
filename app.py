@@ -5,17 +5,22 @@ import os
 
 app = Flask(__name__)
 
-# Serve the Retro D&D Frontend
+# serve the Retro D&D Frontend
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
 
-# The API endpoint that connects to your compiler
+# Serve GIFs, MP3s, and Fonts from the assets folder
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory('assets', filename)
+# --------------------------
+# API endpoint that connects to compiler
 @app.route('/cast', methods=['POST'])
 def cast_spell():
     data = request.json
     code = data.get('code', '')
-    user_inputs = data.get('inputs', '') # Catch the inputs from the web
+    user_inputs = data.get('inputs', '') #catch the inputs from the browser
 
     if not code:
         return jsonify({"status": "curse", "message": "Miss! No scroll equipped."})
@@ -25,7 +30,7 @@ def cast_spell():
         f.write(code)
 
     try:
-        # We pass the `input=user_inputs` argument here!
+        # We pass the `input=user_inputs` argument here
         # This acts exactly like someone typing the answers and pressing Enter.
         result = subprocess.run(
             ['python', '-m', 'src.main', temp_file],
