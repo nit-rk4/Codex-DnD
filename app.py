@@ -26,17 +26,25 @@ def cast_spell():
         return jsonify({"status": "curse", "message": "Miss! No scroll equipped."})
 
     temp_file = "temp_incantation.scroll"
-    with open(temp_file, 'w') as f:
+    
+    # 🛡️ WARD 1: Force the temporary scroll to save with modern runes (UTF-8)
+    with open(temp_file, 'w', encoding='utf-8') as f:
         f.write(code)
 
     try:
+        # 🛡️ WARD 2: Force Windows terminal environment to output modern runes (UTF-8)
+        run_env = os.environ.copy()
+        run_env["PYTHONIOENCODING"] = "utf-8"
+
         # We pass the `input=user_inputs` argument here
         # This acts exactly like someone typing the answers and pressing Enter.
         result = subprocess.run(
             ['python', '-m', 'src.main', temp_file],
             input=user_inputs, 
             capture_output=True,
-            text=True
+            text=True,
+            encoding='utf-8', 
+            env=run_env       
         )
 
         if os.path.exists(temp_file):
