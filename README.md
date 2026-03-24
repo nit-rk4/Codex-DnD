@@ -93,8 +93,23 @@ RUNE_STONE        ::= [0-9]+
 ### Requirements
 
 - Python 3.8 or higher
-- No external dependencies — stdlib only!
+`Flask` (for the magical web interface)
 
+*To install the required web dependencies, run:*
+```bash
+pip install flask
+```
+### 🌐 The Web Interface (Recommended)
+To run the Codex-DnD compiler with its retro tavern web interface:
+
+1. **Awaken the Oracle (Start the Server):**
+   Run this command in your terminal to start the Flask backend:
+   ```bash
+   python app.py
+2. **Enter the Tavern:**
+   Open your web browser and navigate to: http://127.0.0.1:5000
+3. **Cast Spells:**
+   Click the > PRESS START < screen to trigger the music, type your incantation into the scroll,    and click > CAST SPELL 🪄 to see the results in the Battle Log!
 ### Run a Scroll
 
 ```bash
@@ -193,7 +208,10 @@ python -m unittest tests.test_interpreter
 ```
 Codex-DnD/
 ├── README.md                   # This file
-├── requirements.txt            # No external dependencies
+├── requirements.txt            # Project dependencies (Flask)
+├── app.py                      # Flask web server
+├── index.html                  # 🎨 The Spellbook — Web frontend UI
+├── assets/                     # Images, fonts, and tavern music
 ├── src/
 │   ├── __init__.py
 │   ├── curses.py               # 💀 Curses — D&D-themed exceptions

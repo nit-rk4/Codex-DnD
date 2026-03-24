@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Codex-D&D Compiler</title>
+    <style>
+        /* --- 1. VARIABLES --- */
+        :root {
+            --bg-color: #5663f6;
+            --rpg-blue: #000000;
+            --rpg-border: #ffffff;
+            --text-main: #ffffff;
+            --text-dim: #f6eeee;
+            --color-error: #ff5555;
+            --color-success: #55ff55;
+            --color-system: #ffff55;
+        }
+
+        /* --- 2. OFFLINE FONTS --- */
+        @font-face {
+            font-family: 'ArcadeFont';
+            src: url('assets/PressStart2P-Regular.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'TerminalFont';
+            src: url('assets/VT323-Regular.ttf') format('truetype');
+        }
+
+        /* --- 3. BASE STYLES --- */
+        body {
+            /* Keep pixels sharp! */
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeSpeed;
+            
+            color: var(--text-main);
+            font-family: 'ArcadeFont', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            
+            background: url('assets/ani_bg_inside_by_brullov.gif') center/cover fixed no-repeat var(--bg-color);
+        }
+
+        h1, h2, button, .press-start {
+            font-family: 'ArcadeFont', monospace;
+        }
+
+        textarea, input, #output-console, .log-line {
+            font-family: 'TerminalFont', monospace;
+            font-size: 24px; 
+        }
+
+        /* --- 4. INTRO SCREEN --- */
+        #intro-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('assets/anmtd_bg_by_brullov.gif') center/cover no-repeat #222; 
+            
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 1s ease-out;
+        }
+
+        .intro-content {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border: 4px solid var(--rpg-border);
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--color-system);
+        }
+
+        .intro-content h1 {
+            font-size: 4rem;
+            color: var(--color-system);
+            margin: 0;
+            text-shadow: 4px 4px 0px #000;
+        }
+
+        .intro-content h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin-top: 10px;
+            margin-bottom: 40px;
+            letter-spacing: 5px;
+        }
+
+        .press-start {
+            font-size: 1.5rem;
+            color: var(--color-success);
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        /* --- 5. MAIN APP LAYOUT --- */
+        #main-app {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            text-shadow: 4px 4px 0px #555; 
+        }
+
+        header h1 { 
+            color: var(--color-system); 
+            font-size: 2rem; 
+            margin: 0 0 10px 0; 
+        }
+
+        .subtitle { 
+            color: var(--text-dim); 
+            font-size: 0.7rem; 
+        }
+
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1200px; 
+            flex: 1; 
+        }
+
+        /* --- 6. RPG BOXES --- */
+        .rpg-box {
+            flex: 1; 
+            min-width: 300px; 
+            background-color: var(--rpg-blue);
+            border: 4px solid var(--rpg-border); 
+            border-radius: 4px; 
+            padding: 20px;
+            box-shadow: inset 0 0 0 4px var(--rpg-blue), inset 0 0 0 6px var(--rpg-border), 8px 8px 0px rgba(0,0,0,0.8);
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .rpg-box h2 {
+            font-size: 1rem; 
+            color: var(--color-system); 
+            margin-top: 0; 
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--text-dim); 
+            padding-bottom: 10px;
+        }
+
+        /* --- 7. INPUTS & CONSOLE --- */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            color: var(--text-dim); 
+            font-size: 0.8rem;
+            font-family: 'ArcadeFont', monospace;
+        }
+
+        #scroll-inputs {
+            width: 100%; 
+            background: #000; 
+            border: 2px solid var(--text-dim); 
+            color: var(--color-system); 
+            padding: 8px; 
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+
+        #editor-container { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 200px;
+        }
+
+        textarea {
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            outline: none; 
+            resize: none;
+            color: var(--text-main);
+            line-height: 1.2; 
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        #output-console {
+            flex: 1; 
+            overflow-y: auto; 
+            text-shadow: 2px 2px 0px #000; 
+            line-height: 1.3;
+            min-height: 200px;
+        }
+
+        .log-line { margin-bottom: 8px; }
+        .log-sys { color: var(--color-system); }
+        .log-err { color: var(--color-error); }
+        .log-ok { color: var(--color-success); }
+
+        /* --- 8. CONTROLS --- */
+        .controls { 
+            margin-top: 20px; 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+        }
+
+        button {
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            font-size: 0.7rem; 
+            border: 2px solid var(--rpg-border); 
+            padding: 12px 15px; 
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        button:hover { 
+            background: var(--rpg-border); 
+            color: var(--bg-color); 
+        }
+
+        button:active { 
+            box-shadow: 0px 0px 0px #000; 
+            transform: translate(4px, 4px); 
+        }
+
+        /* --- 9. ANIMATIONS --- */
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div id="intro-screen" onclick="startGame()">
+        <div class="intro-content">
+            <h1>[🐉 CODEX-DnD 🐉]</h1>
+            <h2>⚔️ The Arcane Compiler ⚔️</h2>
+            <div class="blink press-start">> PRESS START &lt;</div>
+        </div>
+    </div>
+<audio id="bg-music" loop>
+        <source src="assets/mysticgrove_by_alkakrab.mp3" type="audio/mpeg">
+    </audio>
+    <div id="main-app">
+        <header>
+            <h1>[ THE CODEX- DnD COMPILER ]<br></h1>
+            <div class="subtitle">"May your scrolls compile without curses, and your spells execute without fizzling."</div>
+        </header>
+  
+        <div class="container">
+            
+            <div class="rpg-box">
+                <h2>> INVENTORY: SCROLL</h2>
+                
+                <div class="input-group">
+                    <label>> OFFERINGS (INPUTS):</label>
+                    <input type="text" id="scroll-inputs" placeholder="e.g. 5 10">
+                </div>
+                
+                <div id="editor-container">
+                    <textarea id="scroll-code" spellcheck="false" placeholder="/* Enter incantation... */">
+summon a;
+summon b;
+summon result;
+a = 10;
+b = 3;
+result = a + b * 2;
+cast result;
+</textarea>
+                </div>
+                
+                <div class="controls">
+                    <button onclick="castSpell()"> > CAST SPELL 🪄</button>
+                    <button onclick="clearScroll()"> > CLEAR ✨</button>
+                </div>
+            </div>
+
+            <div class="rpg-box">
+                <h2>> BATTLE LOG</h2>
+                <div id="output-console">
+                    <div class="log-line">Waiting for command<span class="blink">_</span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function startGame() {
+            const introScreen = document.getElementById('intro-screen');
+            const mainApp = document.getElementById('main-app');
+            
+            
+            const music = document.getElementById('bg-music');
+            music.volume = 0.3; // Sets volume to 30% so it's not too loud
+            music.play(); 
+
+            introScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                introScreen.style.display = 'none';
+                mainApp.style.display = 'flex'; 
+            }, 1000); 
+        }
+        async function typeText(elementId, htmlContent) {
+            const consoleEl = document.getElementById(elementId);
+            const newDiv = document.createElement('div');
+            newDiv.className = 'log-line';
+            newDiv.innerHTML = htmlContent;
+            consoleEl.appendChild(newDiv);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        async function castSpell() {
+            const code = document.getElementById('scroll-code').value;
+            const consoleEl = document.getElementById('output-console');
+            
+            consoleEl.innerHTML = ''; 
+            
+            if (!code.trim()) {
+                typeText('output-console', '<span class="log-err">Miss! No scroll equipped.</span>');
+                return;
+            }
+
+            typeText('output-console', '<span class="log-sys">> The Scribe analyzes the runes...</span>');
+
+            try {
+                const inputs = document.getElementById('scroll-inputs').value;
+
+                const response = await fetch('/cast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        code: code,
+                        inputs: inputs 
+                    })
+                });
+                
+                const result = await response.json();
+                const formattedMessage = result.message ? result.message.replace(/\n/g, '<br>') : "No output.";
+                
+                if (result.status === 'curse') {
+                    typeText('output-console', `<span class="log-err">CRITICAL HIT! Compiler Curse:<br><br>${formattedMessage}</span>`);
+                } else {
+                    typeText('output-console', `<span class="log-sys">> The Enchanter casts the spell!</span>`);
+                    typeText('output-console', `<span class="log-ok">VICTORY! Output:<br><br>${formattedMessage}</span> <span class="blink">_</span>`);
+                }
+            } catch (error) {
+                typeText('output-console', `<span class="log-err">Server Error: The connection to The Codex was lost.</span>`);
+                console.error("Cast Error:", error);
+            }
+        }
+
+        function clearScroll() {
+            document.getElementById('scroll-code').value = '';
+            document.getElementById('output-console').innerHTML = '<div class="log-line">Inventory cleared. Waiting for command<span class="blink">_</span></div>';
+        }
+    </script>
+</body>
+</html>
